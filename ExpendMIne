@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>🧱 ExpendMine — Главная</title>
+  <meta name="description" content="ExpendMine — ванильный Minecraft сервер (ПК, Java). Без приватов. Сайт оформлен в стиле Minecraft с нежной темой сакуры." />
+  <meta name="theme-color" content="#f0a7c4" />
+  <!-- Пиксельный шрифт + аккуратный гротеск -->
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;600;700&family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      /* Сакура‑палитра */
+      --bg: #0b0f1a;           /* тёмное небо */
+      --bg-2:#12182a;          /* глубина */
+      --text:#f7f7fb;
+      --muted:#cbd1e6;
+      --sakura-1:#ffb7d5;      /* светло‑розовый */
+      --sakura-2:#f38cb8;      /* насыщенный розовый */
+      --sakura-3:#b57bb3;      /* сиреневый */
+      --leaf:#77dd77;          /* листва */
+      --panel:#11162a;
+      --line:rgba(255,255,255,.08);
+      --ring:rgba(243,140,184,.45);
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{
+      margin:0; color:var(--text);
+      font-family:Inter, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background:
+        radial-gradient(1100px 700px at 20% -20%, rgba(243,140,184,.15), transparent 60%),
+        radial-gradient(900px 600px at 100% 10%, rgba(181,123,179,.18), transparent 55%),
+        linear-gradient(180deg, var(--bg) 0%, var(--bg-2) 100%);
+      position:relative; overflow-x:hidden;
+    }
+    /* Лёгкий «майн‑блок» узор */
+    body::before{
+      content:""; position:fixed; inset:0; pointer-events:none; opacity:.14;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.06) 1px, transparent 1px) 0 0 / 16px 16px,
+        linear-gradient(0deg, rgba(255,255,255,.06) 1px, transparent 1px) 0 0 / 16px 16px;
+    }
+
+    .container{max-width:980px;margin:0 auto;padding:0 18px}
+    h1,h2{font-family:"Pixelify Sans", system-ui, sans-serif}
+    h1{font-size:clamp(34px,4.5vw,64px);letter-spacing:1px;
+       text-shadow:0 4px 0 rgba(0,0,0,.35), 0 0 30px rgba(243,140,184,.35)}
+    h2{font-size:clamp(22px,2.6vw,36px)}
+    p.sub{color:var(--muted)}
+
+    .brand{display:flex;align-items:center;gap:14px}
+    .logo{width:58px;height:58px;flex:0 0 58px;border-radius:12px;box-shadow:0 8px 28px rgba(243,140,184,.25)}
+
+    .button{display:inline-flex;align-items:center;gap:.6rem;border:none;border-radius:12px;padding:.9rem 1.1rem;font-weight:800;cursor:pointer;
+      background:linear-gradient(135deg,var(--sakura-1),var(--sakura-2)); color:#2a0f1d;
+      box-shadow:0 10px 25px rgba(243,140,184,.25); transition:transform .15s ease, box-shadow .2s}
+    .button:hover{transform:translateY(-2px); box-shadow:0 14px 35px rgba(243,140,184,.35)}
+    .ghost{background:transparent;color:var(--text);border:1px solid var(--line)}
+
+    header.hero{padding:84px 0 56px; position:relative}
+    header .hero-card{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:18px; padding:18px}
+    .ip{display:flex; gap:10px}
+    .ip input{flex:1;padding:14px;border-radius:12px;border:1px solid var(--line);background:#0f1630;color:#fff;font-weight:800;letter-spacing:.3px}
+
+    section{padding:54px 0}
+    .card{background:rgba(255,255,255,.04); border:1px solid var(--line); border-radius:16px; padding:18px}
+
+    /* Галерея/скриншоты — заглушки можно заменить */
+    .gallery{display:grid;grid-template-columns:2fr 1fr;gap:12px}
+    .shot{height:220px;border-radius:14px;background:#0f1836;border:1px solid var(--line);overflow:hidden}
+    .shot.small{height:104px}
+
+    footer{padding:32px 0 56px;color:var(--muted)}
+
+    /* Падающие лепестки сакуры */
+    .sakura{position:fixed; inset:0; pointer-events:none; overflow:hidden; z-index:0}
+    .petal{position:absolute; top:-10vh; width:14px; height:12px; border-radius:60% 40% 60% 40%;
+      background:radial-gradient(circle at 30% 30%, #fff, var(--sakura-1) 60%, var(--sakura-2));
+      box-shadow:0 0 10px rgba(243,140,184,.45)}
+    @keyframes fall{ to{ transform:translate3d(var(--x), 110vh, 0) rotate(540deg);} }
+  </style>
+</head>
+<body>
+  <!-- Слой с лепестками -->
+  <div class="sakura" id="sakura"></div>
+
+  <header class="hero">
+    <div class="container">
+      <div class="brand">
+        <!-- ЛОГО: куб + цветок сакуры (SVG, без внешних файлов) -->
+        <svg viewBox="0 0 64 64" class="logo" aria-label="Логотип ExpendMine" role="img">
+          <defs>
+            <linearGradient id="faceL" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#3b4a7a"/>
+              <stop offset="1" stop-color="#1c2646"/>
+            </linearGradient>
+            <linearGradient id="faceR" x1="1" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#4b5d99"/>
+              <stop offset="1" stop-color="#26335d"/>
+            </linearGradient>
+            <linearGradient id="faceT" x1="0" y1="0" x2="0" y2="1">
+              <stop offset="0" stop-color="#5c74c9"/>
+              <stop offset="1" stop-color="#394a86"/>
+            </linearGradient>
+          </defs>
+          <!-- Изометрический «майн‑куб» -->
+          <polygon points="32,6 12,16 12,40 32,50 52,40 52,16" fill="url(#faceT)"/>
+          <polygon points="12,16 12,40 32,50 32,26" fill="url(#faceL)"/>
+          <polygon points="52,16 32,26 32,50 52,40" fill="url(#faceR)"/>
+          <!-- Травяной слой -->
+          <path d="M12 16 L32 6 L52 16 L32 26 Z" fill="#6fe38e" opacity="0.9"/>
+          <!-- Цветок сакуры -->
+          <g transform="translate(40,22) scale(0.9)">
+            <circle cx="0" cy="0" r="3.6" fill="#ffe3ef"/>
+            <path d="M0 -10 C 2 -8, 4 -6, 3 -2 C 1 0, -1 0, -3 -2 C -4 -6, -2 -8, 0 -10 Z" fill="#f7a8c9"/>
+            <path d="M10 0 C 8 -2, 6 -4, 2 -3 C 0 -1, 0 1, 2 3 C 6 4, 8 2, 10 0 Z" fill="#f7a8c9"/>
+            <path d="M0 10 C -2 8, -4 6, -3 2 C -1 0, 1 0, 3 2 C 4 6, 2 8, 0 10 Z" fill="#f7a8c9"/>
+            <path d="M-10 0 C -8 2, -6 4, -2 3 C 0 1, 0 -1, -2 -3 C -6 -4, -8 -2, -10 0 Z" fill="#f7a8c9"/>
+            <circle cx="0" cy="0" r="1.2" fill="#ffd9ed"/>
+          </g>
+        </svg>
+        <div>
+          <h1 style="margin:0">ExpendMine</h1>
+          <p class="sub" style="margin:2px 0 0">Vanilla • Java (ПК) • Sakura style</p>
+        </div>
+      </div>
+
+      <p class="sub" style="margin:14px 0 18px">Ванильный сервер Minecraft для Java Edition (ПК) • Без приватов • Честное выживание 🌸</p>
+      <div class="hero-card">
+        <div class="ip">
+          <input id="serverIp" value="ExpendMine.aternos.me" readonly aria-label="IP адрес сервера" />
+          <button class="button" id="copyBtn">Скопировать IP</button>
+        </div>
+        <p class="sub" style="margin:.6rem 0 0">Подключайся по адресу и увидимся в мире!</p>
+      </div>
+    </div>
+  </header>
+
+  <section id="about">
+    <div class="container">
+      <h2>О сервере</h2>
+      <div class="card">
+        <p>ExpendMine — это ванильный Minecraft‑сервер без приватов и донат‑преимуществ. Всё держится на доверии и уважении игроков. Строй, исследуй, торгуй и объединяйся — как в настоящем выживании.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="rules">
+    <div class="container">
+      <h2>Правила</h2>
+      <div class="card">
+        <ol>
+          <li>Не использовать читы, дюпы и сторонние модификации, дающие преимущество.</li>
+          <li>Не гриферить и не портить чужие постройки без согласия владельца.</li>
+          <li>Не красть ресурсы у других игроков.</li>
+          <li>Не злоупотреблять лагами, багами и механиками игры.</li>
+          <li>Уважай других участников сообщества и администрацию.</li>
+          <li>Не устраивай спам, флууд или рекламу сторонних серверов.</li>
+          <li>Администрация имеет право принимать решения в спорных ситуациях.</li>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <section id="donate">
+    <div class="container" style="text-align:center">
+      <h2>Донат</h2>
+      <div class="card">
+        <p><b>Поддержи развитие ExpendMine!</b> Донат помогает оплачивать хостинг и развивать проект. Привилегии носят косметический/удобный характер и не дают нечестного преимущества.</p>
+        <a class="button" href="https://discord.gg/JvWqdDtr" target="_blank" rel="noopener">Купить донат в Discord</a>
+      </div>
+    </div>
+  </section>
+
+  <section id="contacts">
+    <div class="container">
+      <h2>Контакты</h2>
+      <div class="card">
+        <p>Discord сервер: <a href="https://discord.gg/JvWqdDtr" target="_blank" style="color:var(--sakura-1);font-weight:800">https://discord.gg/JvWqdDtr</a></p>
+        <p>Email: <a href="mailto:expendmine@mail.ru" style="color:var(--sakura-1);font-weight:800">expendmine@mail.ru</a></p>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      © <span id="year"></span> ExpendMine. Неофициальный проект Mojang.
+    </div>
+  </footer>
+
+  <script>
+    // Копирование IP
+    const copyBtn = document.getElementById('copyBtn');
+    copyBtn?.addEventListener('click', async ()=>{
+      const ip = document.getElementById('serverIp').value;
+      try{ await navigator.clipboard.writeText(ip); copyBtn.textContent = 'Скопировано!'; setTimeout(()=> copyBtn.textContent='Скопировать IP', 1600);}catch{ alert('Не удалось скопировать IP'); }
+    });
+
+    // Анимация лепестков
+    const sakura = document.getElementById('sakura');
+    const PETALS = 26;
+    for(let i=0;i<PETALS;i++){
+      const p=document.createElement('span');
+      p.className='petal';
+      const startX = Math.random()*100; // %
+      const drift = (Math.random()*40-20)+'vw';
+      const duration = 10+Math.random()*12; // сек
+      const delay = (-Math.random()*12).toFixed(2); // для равномерного потока
+      const size = 10+Math.random()*12; // px
+      p.style.left = startX+'vw';
+      p.style.width = size+'px';
+      p.style.height = size*0.85+'px';
+      p.style.animation = `fall ${duration}s linear ${delay}s infinite`;
+      p.style.setProperty('--x',drift);
+      sakura.appendChild(p);
+    }
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+</body>
+</html>
